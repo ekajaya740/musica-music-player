@@ -43,19 +43,25 @@ class _MyListViewContainer extends State<MyListViewContainer> {
   @override
   void initState() {
     super.initState();
-    _init();
+    // _init();
   }
 
-  Future<void> _init() async {
-    audioPlayer
-        .setAudioSource(ConcatenatingAudioSource(children: [
-      for (int i = 0; i < songs.length; i++)
-        AudioSource.uri(Uri.parse(songs[i].uri!))
-    ]))
-        .catchError((error) {
-      print("An error occured $error");
-    });
-  }
+  // Future<void> _init() async {
+  //   audioPlayer
+  //       .setAudioSource(ConcatenatingAudioSource(children: [
+  //     for (int i = 0; i < songs.length; i++)
+  //       AudioSource.uri(Uri.parse(songs[i].uri!))
+  //   ]))
+  //       .catchError((error) {
+  //     print("An error occured $error");
+  //   });
+  // }
+
+  // @override
+  // void dispose() {
+  //   audioPlayer.dispose();
+  //   super.dispose();
+  // }
 
   _playSong() {
     Navigator.push(
@@ -67,6 +73,8 @@ class _MyListViewContainer extends State<MyListViewContainer> {
           title: songs[index].title,
           artwork: artwork,
           audioPlayer: audioPlayer,
+          songs: songs,
+          index: index,
         ),
       ),
     );

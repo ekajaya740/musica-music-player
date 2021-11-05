@@ -11,6 +11,8 @@ class SongScreen extends StatefulWidget {
   final QueryArtworkWidget artwork;
   final String artist;
   final AudioPlayer audioPlayer;
+  final List<SongModel> songs;
+  final int index;
 
   SongScreen({
     required this.title,
@@ -18,6 +20,8 @@ class SongScreen extends StatefulWidget {
     required this.artwork,
     required this.source,
     required this.audioPlayer,
+    required this.songs,
+    required this.index,
   });
   @override
   State<StatefulWidget> createState() => _SongScreen(
@@ -26,6 +30,8 @@ class SongScreen extends StatefulWidget {
         artwork: artwork,
         source: source,
         audioPlayer: audioPlayer,
+        songs: songs,
+        index: index,
       );
 }
 
@@ -35,6 +41,8 @@ class _SongScreen extends State<SongScreen> {
   final QueryArtworkWidget artwork;
   final String artist;
   final AudioPlayer audioPlayer;
+  final List<SongModel> songs;
+  final int index;
 
   _SongScreen({
     required this.title,
@@ -42,7 +50,20 @@ class _SongScreen extends State<SongScreen> {
     required this.artwork,
     required this.source,
     required this.audioPlayer,
+    required this.songs,
+    required this.index,
   });
+
+  @override
+  void initState() {
+    super.initState();
+    // audioPlayer.setUrl(source);
+    _init();
+  }
+
+  Future<void> _init() async {
+    audioPlayer.setAudioSource(AudioSource.uri(Uri.parse(songs[index].uri!)));
+  }
 
   @override
   void dispose() {
@@ -61,6 +82,8 @@ class _SongScreen extends State<SongScreen> {
             horizontal: 19,
           ),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -91,70 +114,80 @@ class _SongScreen extends State<SongScreen> {
                   ),
                 ],
               ),
-              ClipRRect(
-                borderRadius: BorderRadius.circular(10),
-                child: SizedBox(
-                  width: 310,
-                  height: 205,
-                  child: QueryArtworkWidget(
-                    id: artwork.id,
-                    type: artwork.type,
-                    nullArtworkWidget:
-                        const NullArtworkWidget(artworkSize: 148),
-                    artworkFit: BoxFit.scaleDown,
-                    artworkBorder: const BorderRadius.all(
-                      Radius.circular(10),
+              // SizedBox(
+              //   height: 100,
+              // ),
+              Wrap(alignment: WrapAlignment.center, children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(10),
+                  child: SizedBox(
+                    width: 310,
+                    height: 205,
+                    child: QueryArtworkWidget(
+                      id: artwork.id,
+                      type: artwork.type,
+                      nullArtworkWidget:
+                          const NullArtworkWidget(artworkSize: 148),
+                      artworkFit: BoxFit.scaleDown,
+                      artworkBorder: const BorderRadius.all(
+                        Radius.circular(10),
+                      ),
                     ),
                   ),
                 ),
-              ),
-              Column(children: [
-                MyText(
-                  title,
-                  textAlign: TextAlign.center,
-                  fontWeight: FontWeight.w700,
-                  fontSize: 24,
-                  maxLines: 2,
-                ),
-                MyText(
-                  artist,
-                  textAlign: TextAlign.center,
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
-                  color: primaryColor300,
-                ),
+                Padding(
+                    padding: const EdgeInsets.only(
+                      top: 10,
+                    ),
+                    child: Column(children: [
+                      MyText(
+                        title,
+                        textAlign: TextAlign.center,
+                        fontWeight: FontWeight.w700,
+                        fontSize: 24,
+                        maxLines: 2,
+                      ),
+                      MyText(
+                        artist,
+                        textAlign: TextAlign.center,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                        color: primaryColor300,
+                      ),
+                    ])),
               ]),
+
               Column(mainAxisAlignment: MainAxisAlignment.center, children: [
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    StreamBuilder<bool>(
-                        stream: audioPlayer.shuffleModeEnabledStream,
-                        builder: (context, snapshot) {
-                          return _playShuffle(context, snapshot.data ?? false);
-                        }),
-                    StreamBuilder<SequenceState?>(
-                        stream: audioPlayer.sequenceStateStream,
-                        builder: (_, __) {
-                          return _playPrev();
-                        }),
+                    // StreamBuilder<bool>(
+                    //     stream: audioPlayer.shuffleModeEnabledStream,
+                    //     builder: (context, snapshot) {
+                    //       return _playShuffle(context, snapshot.data ?? false);
+                    //     }),
+                    // StreamBuilder<SequenceState?>(
+                    //     stream: audioPlayer.sequenceStateStream,
+                    //     builder: (_, __) {
+                    //       return _playPrev();
+                    //     }),
                     StreamBuilder<PlayerState>(
                         stream: audioPlayer.playerStateStream,
                         builder: (_, snapshot) {
                           final playerState = snapshot.data;
                           return _playButton(playerState!);
                         }),
-                    StreamBuilder<SequenceState?>(
-                        stream: audioPlayer.sequenceStateStream,
-                        builder: (_, __) {
-                          return _playNext();
-                        }),
-                    StreamBuilder<LoopMode>(
-                        stream: audioPlayer.loopModeStream,
-                        builder: (context, snapshot) {
-                          return _playRepeat(
-                              context, snapshot.data ?? LoopMode.off);
-                        }),
+                    // StreamBuilder<SequenceState?>(
+                    //     stream: audioPlayer.sequenceStateStream,
+                    //     builder: (_, __) {
+                    //       return _playNext();
+                    //     }),
+                    // StreamBuilder<LoopMode>(
+                    //     stream: audioPlayer.loopModeStream,
+                    //     builder: (context, snapshot) {
+                    //       return _playRepeat(
+                    //           context, snapshot.data ?? LoopMode.off);
+                    //     }),
                   ],
                 )
               ])
@@ -173,7 +206,9 @@ class _SongScreen extends State<SongScreen> {
         shape: const CircleBorder(),
         elevation: 1,
       ),
-      onPressed: playing ? audioPlayer.pause : audioPlayer.play,
+      onPressed: () {
+        playing ? audioPlayer.pause : audioPlayer.play;
+      },
       child: Container(
         decoration: const BoxDecoration(
           boxShadow: [
@@ -185,8 +220,8 @@ class _SongScreen extends State<SongScreen> {
           shape: BoxShape.circle,
         ),
         child: Ink(
-          width: 60,
-          height: 60,
+          width: 80,
+          height: 80,
           decoration: const BoxDecoration(
             shape: BoxShape.circle,
             gradient: LinearGradient(
@@ -210,71 +245,71 @@ class _SongScreen extends State<SongScreen> {
     );
   }
 
-  Widget _playNext() {
-    return IconButton(
-      icon: const Icon(
-        Icons.skip_next_rounded,
-        color: Colors.white,
-      ),
-      onPressed: () {
-        audioPlayer.seekToNext();
-      },
-    );
-  }
+  // Widget _playNext() {
+  //   return IconButton(
+  //     icon: const Icon(
+  //       Icons.skip_next_rounded,
+  //       color: Colors.white,
+  //     ),
+  //     onPressed: () {
+  //       audioPlayer.seekToNext();
+  //     },
+  //   );
+  // }
 
-  Widget _playPrev() {
-    return IconButton(
-      icon: const Icon(
-        Icons.skip_previous_rounded,
-        color: Colors.white,
-      ),
-      onPressed: audioPlayer.hasPrevious ? audioPlayer.seekToPrevious : null,
-    );
-  }
+  // Widget _playPrev() {
+  //   return IconButton(
+  //     icon: const Icon(
+  //       Icons.skip_previous_rounded,
+  //       color: Colors.white,
+  //     ),
+  //     onPressed: audioPlayer.hasPrevious ? audioPlayer.seekToPrevious : null,
+  //   );
+  // }
 
-  Widget _playShuffle(BuildContext context, bool isShuffle) {
-    return IconButton(
-      icon: Icon(
-        isShuffle ? Icons.shuffle_on_rounded : Icons.shuffle_rounded,
-        color: Colors.white,
-      ),
-      onPressed: () async {
-        final enable = !isShuffle;
-        if (enable) {
-          await audioPlayer.shuffle();
-        }
-        await audioPlayer.setShuffleModeEnabled(enable);
-      },
-    );
-  }
+//   Widget _playShuffle(BuildContext context, bool isShuffle) {
+//     return IconButton(
+//       icon: Icon(
+//         isShuffle ? Icons.shuffle_on_rounded : Icons.shuffle_rounded,
+//         color: Colors.white,
+//       ),
+//       onPressed: () async {
+//         final enable = !isShuffle;
+//         if (enable) {
+//           await audioPlayer.shuffle();
+//         }
+//         await audioPlayer.setShuffleModeEnabled(enable);
+//       },
+//     );
+//   }
 
-  Widget _playRepeat(BuildContext context, LoopMode loopMode) {
-    final _repeatIcon = [
-      const Icon(
-        Icons.repeat_rounded,
-        color: Colors.white,
-      ),
-      const Icon(
-        Icons.repeat_on_rounded,
-        color: Colors.white,
-      ),
-      const Icon(
-        Icons.repeat_one_rounded,
-        color: Colors.white,
-      ),
-    ];
-    const cycleModes = [
-      LoopMode.off,
-      LoopMode.all,
-      LoopMode.one,
-    ];
-    final index = cycleModes.indexOf(loopMode);
-    return IconButton(
-      icon: _repeatIcon[index],
-      onPressed: () {
-        audioPlayer.setLoopMode(
-            cycleModes[(cycleModes.indexOf(loopMode) + 1) % cycleModes.length]);
-      },
-    );
-  }
+//   Widget _playRepeat(BuildContext context, LoopMode loopMode) {
+//     final _repeatIcon = [
+//       const Icon(
+//         Icons.repeat_rounded,
+//         color: Colors.white,
+//       ),
+//       const Icon(
+//         Icons.repeat_on_rounded,
+//         color: Colors.white,
+//       ),
+//       const Icon(
+//         Icons.repeat_one_rounded,
+//         color: Colors.white,
+//       ),
+//     ];
+//     const cycleModes = [
+//       LoopMode.off,
+//       LoopMode.all,
+//       LoopMode.one,
+//     ];
+//     final index = cycleModes.indexOf(loopMode);
+//     return IconButton(
+//       icon: _repeatIcon[index],
+//       onPressed: () {
+//         audioPlayer.setLoopMode(
+//             cycleModes[(cycleModes.indexOf(loopMode) + 1) % cycleModes.length]);
+//       },
+//     );
+//   }
 }
