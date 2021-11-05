@@ -46,6 +46,7 @@ class MyAppBarState extends State<MyAppBar> {
       elevation: 0,
       actions: actions,
       automaticallyImplyLeading: true,
+      titleSpacing: 30,
     );
   }
 }

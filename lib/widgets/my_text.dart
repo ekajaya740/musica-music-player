@@ -8,6 +8,7 @@ class MyText extends StatelessWidget {
   final FontWeight fontWeight;
   final double fontSize;
   final TextAlign textAlign;
+  final int maxLines;
 
   const MyText(
     this.text, {
@@ -16,6 +17,7 @@ class MyText extends StatelessWidget {
     this.fontWeight = FontWeight.w400,
     this.fontSize = 16,
     this.textAlign = TextAlign.start,
+    this.maxLines = 1,
   }) : super(key: key);
   @override
   Widget build(BuildContext context) {
@@ -31,6 +33,7 @@ class MyText extends StatelessWidget {
       textAlign: textAlign,
       overflow: TextOverflow.ellipsis,
       softWrap: false,
+      maxLines: maxLines,
     );
   }
 }

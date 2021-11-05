@@ -85,10 +85,6 @@ class _MainScreen extends State<MainScreen> {
                   fontSize: 24,
                 ),
               ),
-              // MyListViewContainer(
-              //   title: "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
-              //   artist: "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
-              // ),
               FutureBuilder<List<SongModel>>(
                   future: _audioQuery.querySongs(),
                   builder: (context, item) {
@@ -101,20 +97,22 @@ class _MainScreen extends State<MainScreen> {
                       );
                     }
                     return SizedBox(
-                        width: MediaQuery.of(context).size.width,
-                        height: MediaQuery.of(context).size.height -
-                            (kToolbarHeight + 176),
-                        child: ListView.builder(
-                          itemCount: item.data!.length,
-                          itemBuilder: (context, index) => MyListViewContainer(
-                            title: item.data![index].title,
-                            artist: item.data![index].artist ?? "No Artist",
-                            artwork: QueryArtworkWidget(
-                              id: item.data![index].id,
-                              type: ArtworkType.ALBUM,
-                            ),
+                      width: MediaQuery.of(context).size.width,
+                      height: MediaQuery.of(context).size.height -
+                          (kToolbarHeight + 176),
+                      child: ListView.builder(
+                        itemCount: item.data!.length,
+                        itemBuilder: (context, index) => MyListViewContainer(
+                          title: item.data![index].title,
+                          artist: item.data![index].artist ?? "No Artist",
+                          artwork: QueryArtworkWidget(
+                            id: item.data![index].id,
+                            type: ArtworkType.ARTIST,
                           ),
-                        ));
+                          uri: item.data![index].uri!,
+                        ),
+                      ),
+                    );
                   }),
             ],
           ),

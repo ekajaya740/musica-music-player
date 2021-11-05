@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:musica_music_player/constants/color_constants.dart';
 import 'package:musica_music_player/screen/main_screen.dart';
+import 'package:musica_music_player/screen/song_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -34,7 +35,7 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
         scaffoldBackgroundColor: primaryColor500,
       ),
-      home: const MainScreen(),
+      home: MainScreen(),
     );
   }
 }
