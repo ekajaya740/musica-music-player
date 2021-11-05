@@ -3,19 +3,22 @@ import 'package:flutter/material.dart';
 import 'package:musica_music_player/constants/color_constants.dart';
 
 class NullArtworkWidget extends StatelessWidget {
-  const NullArtworkWidget({Key? key}) : super(key: key);
+  final double artworkSize;
+  const NullArtworkWidget({
+    Key? key,
+    required this.artworkSize,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    const double artworkSize = 44;
     return Container(
-      width: artworkSize,
-      height: artworkSize,
+      width: 50,
+      height: 50,
       color: secondaryColor500,
-      child: const Icon(
+      child: Icon(
         Icons.album_outlined,
         color: primaryColor500,
-        size: 44,
+        size: artworkSize,
       ),
     );
   }

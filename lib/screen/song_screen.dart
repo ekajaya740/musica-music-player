@@ -2,64 +2,57 @@ import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:musica_music_player/constants/color_constants.dart';
 import 'package:musica_music_player/widgets/my_text.dart';
+import 'package:musica_music_player/widgets/null_artwork_widget.dart';
+import 'package:on_audio_query/on_audio_query.dart';
 
 class SongScreen extends StatefulWidget {
   final String source;
   final String title;
+  final QueryArtworkWidget artwork;
   final String artist;
+  final AudioPlayer audioPlayer;
 
   SongScreen({
     required this.title,
     required this.artist,
+    required this.artwork,
     required this.source,
+    required this.audioPlayer,
   });
   @override
   State<StatefulWidget> createState() => _SongScreen(
-        title: this.title,
-        artist: this.artist,
-        source: this.source,
+        title: title,
+        artist: artist,
+        artwork: artwork,
+        source: source,
+        audioPlayer: audioPlayer,
       );
 }
 
 class _SongScreen extends State<SongScreen> {
   final String source;
   final String title;
+  final QueryArtworkWidget artwork;
   final String artist;
-  final AudioPlayer _audioPlayer = AudioPlayer();
+  final AudioPlayer audioPlayer;
 
   _SongScreen({
     required this.title,
     required this.artist,
+    required this.artwork,
     required this.source,
+    required this.audioPlayer,
   });
 
   @override
-  void initState() {
-    super.initState();
-    _init();
-  }
-
-  Future<void> _init() async {
-    try {
-      await _audioPlayer.setAudioSource(AudioSource.uri(Uri.parse(source)));
-    } catch (e) {
-      Center(
-        child: MyText(
-          "Error loading audio source: $e",
-        ),
-      );
-    }
-  }
-
-  @override
   void dispose() {
-    _audioPlayer.dispose();
+    audioPlayer.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    _audioPlayer.play();
+    audioPlayer.play();
     return Scaffold(
       body: SafeArea(
         child: Padding(
@@ -98,10 +91,22 @@ class _SongScreen extends State<SongScreen> {
                   ),
                 ],
               ),
-              Container(
-                width: 310,
-                height: 205,
-                color: Colors.white,
+              ClipRRect(
+                borderRadius: BorderRadius.circular(10),
+                child: SizedBox(
+                  width: 310,
+                  height: 205,
+                  child: QueryArtworkWidget(
+                    id: artwork.id,
+                    type: artwork.type,
+                    nullArtworkWidget:
+                        const NullArtworkWidget(artworkSize: 148),
+                    artworkFit: BoxFit.scaleDown,
+                    artworkBorder: const BorderRadius.all(
+                      Radius.circular(10),
+                    ),
+                  ),
+                ),
               ),
               Column(children: [
                 MyText(
@@ -123,35 +128,32 @@ class _SongScreen extends State<SongScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    StreamBuilder<PlayerState>(
-                        stream: _audioPlayer.playerStateStream,
+                    StreamBuilder<bool>(
+                        stream: audioPlayer.shuffleModeEnabledStream,
                         builder: (context, snapshot) {
-                          final playerState = snapshot.data;
-                          return _playShuffle(playerState!);
+                          return _playShuffle(context, snapshot.data ?? false);
+                        }),
+                    StreamBuilder<SequenceState?>(
+                        stream: audioPlayer.sequenceStateStream,
+                        builder: (_, __) {
+                          return _playPrev();
                         }),
                     StreamBuilder<PlayerState>(
-                        stream: _audioPlayer.playerStateStream,
-                        builder: (context, snapshot) {
-                          final playerState = snapshot.data;
-                          return _playPrev(playerState!);
-                        }),
-                    StreamBuilder<PlayerState>(
-                        stream: _audioPlayer.playerStateStream,
-                        builder: (context, snapshot) {
+                        stream: audioPlayer.playerStateStream,
+                        builder: (_, snapshot) {
                           final playerState = snapshot.data;
                           return _playButton(playerState!);
                         }),
-                    StreamBuilder<PlayerState>(
-                        stream: _audioPlayer.playerStateStream,
-                        builder: (context, snapshot) {
-                          final playerState = snapshot.data;
-                          return _playNext(playerState!);
+                    StreamBuilder<SequenceState?>(
+                        stream: audioPlayer.sequenceStateStream,
+                        builder: (_, __) {
+                          return _playNext();
                         }),
-                    StreamBuilder<PlayerState>(
-                        stream: _audioPlayer.playerStateStream,
+                    StreamBuilder<LoopMode>(
+                        stream: audioPlayer.loopModeStream,
                         builder: (context, snapshot) {
-                          final playerState = snapshot.data;
-                          return _playRepeat(playerState!);
+                          return _playRepeat(
+                              context, snapshot.data ?? LoopMode.off);
                         }),
                   ],
                 )
@@ -171,7 +173,7 @@ class _SongScreen extends State<SongScreen> {
         shape: const CircleBorder(),
         elevation: 1,
       ),
-      onPressed: playing ? _audioPlayer.pause : _audioPlayer.play,
+      onPressed: playing ? audioPlayer.pause : audioPlayer.play,
       child: Container(
         decoration: const BoxDecoration(
           boxShadow: [
@@ -208,44 +210,71 @@ class _SongScreen extends State<SongScreen> {
     );
   }
 
-  Widget _playNext(PlayerState playerState) {
+  Widget _playNext() {
     return IconButton(
       icon: const Icon(
         Icons.skip_next_rounded,
         color: Colors.white,
       ),
-      onPressed: () {},
+      onPressed: () {
+        audioPlayer.seekToNext();
+      },
     );
   }
 
-  Widget _playPrev(PlayerState playerState) {
+  Widget _playPrev() {
     return IconButton(
       icon: const Icon(
         Icons.skip_previous_rounded,
         color: Colors.white,
       ),
-      onPressed: () {},
+      onPressed: audioPlayer.hasPrevious ? audioPlayer.seekToPrevious : null,
     );
   }
 
-  Widget _playShuffle(PlayerState playerState) {
-    final bool isShuffle = _audioPlayer.shuffleModeEnabled;
+  Widget _playShuffle(BuildContext context, bool isShuffle) {
     return IconButton(
       icon: Icon(
         isShuffle ? Icons.shuffle_on_rounded : Icons.shuffle_rounded,
         color: Colors.white,
       ),
-      onPressed: () {},
+      onPressed: () async {
+        final enable = !isShuffle;
+        if (enable) {
+          await audioPlayer.shuffle();
+        }
+        await audioPlayer.setShuffleModeEnabled(enable);
+      },
     );
   }
 
-  Widget _playRepeat(PlayerState playerState) {
-    return IconButton(
-      icon: const Icon(
+  Widget _playRepeat(BuildContext context, LoopMode loopMode) {
+    final _repeatIcon = [
+      const Icon(
         Icons.repeat_rounded,
         color: Colors.white,
       ),
-      onPressed: () {},
+      const Icon(
+        Icons.repeat_on_rounded,
+        color: Colors.white,
+      ),
+      const Icon(
+        Icons.repeat_one_rounded,
+        color: Colors.white,
+      ),
+    ];
+    const cycleModes = [
+      LoopMode.off,
+      LoopMode.all,
+      LoopMode.one,
+    ];
+    final index = cycleModes.indexOf(loopMode);
+    return IconButton(
+      icon: _repeatIcon[index],
+      onPressed: () {
+        audioPlayer.setLoopMode(
+            cycleModes[(cycleModes.indexOf(loopMode) + 1) % cycleModes.length]);
+      },
     );
   }
 }
