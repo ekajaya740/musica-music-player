@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:just_audio/just_audio.dart';
 import 'package:musica_music_player/constants/color_constants.dart';
 import 'package:musica_music_player/constants/value_constants.dart';
 import 'package:musica_music_player/widgets/my_app_bar.dart';
@@ -22,21 +21,11 @@ class _MainScreen extends State<MainScreen> {
 
   final OnAudioQuery _audioQuery = OnAudioQuery();
 
-  final AudioPlayer audioPlayer = AudioPlayer();
-
   @override
   void initState() {
     super.initState();
     requestPermission();
   }
-
-  @override
-  void dispose() {
-    audioPlayer.dispose();
-    super.dispose();
-  }
-
-  
 
   requestPermission() async {
     if (!kIsWeb) {
@@ -96,6 +85,10 @@ class _MainScreen extends State<MainScreen> {
                   fontSize: 24,
                 ),
               ),
+              // MyListViewContainer(
+              //   title: "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+              //   artist: "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+              // ),
               FutureBuilder<List<SongModel>>(
                   future: _audioQuery.querySongs(),
                   builder: (context, item) {
@@ -108,21 +101,21 @@ class _MainScreen extends State<MainScreen> {
                       );
                     }
                     return SizedBox(
-                      width: MediaQuery.of(context).size.width,
-                      height: MediaQuery.of(context).size.height -
-                          (kToolbarHeight + 176),
-                      child: ListView.builder(
-                        itemCount: item.data!.length,
-                        itemBuilder: (context, index) => MyListViewContainer(
-                          artwork: QueryArtworkWidget(
-                            id: item.data![index].id,
-                            type: ArtworkType.AUDIO,
+                        width: MediaQuery.of(context).size.width,
+                        height: MediaQuery.of(context).size.height -
+                            (kToolbarHeight + 176),
+                        child: ListView.builder(
+                          itemCount: item.data!.length,
+                          itemBuilder: (context, index) => MyListViewContainer(
+                            title: item.data![index].title,
+                            artist: item.data![index].artist ?? "No Artist",
+                            artwork: QueryArtworkWidget(
+                              id: item.data![index].id,
+                              type: ArtworkType.ALBUM,
+                            ),
+                            uri: item.data![index].uri.toString(),
                           ),
-                          index: index,
-                          songs: item.data!,
-                        ),
-                      ),
-                    );
+                        ));
                   }),
             ],
           ),
