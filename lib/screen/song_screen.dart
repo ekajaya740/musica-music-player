@@ -115,7 +115,7 @@ class _SongScreen extends State<SongScreen> {
                   ),
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(10),
-                    child: Container(
+                    child: SizedBox(
                       width: 310,
                       height: 205,
                       // color: secondaryColor500,
