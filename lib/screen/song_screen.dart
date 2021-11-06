@@ -118,7 +118,7 @@ class _SongScreen extends State<SongScreen> {
                     child: Container(
                       width: 310,
                       height: 205,
-                      color: secondaryColor500,
+                      // color: secondaryColor500,
                       child: QueryArtworkWidget(
                         artworkBorder:
                             const BorderRadius.all(Radius.circular(10)),
@@ -127,7 +127,7 @@ class _SongScreen extends State<SongScreen> {
                         nullArtworkWidget: const NullArtworkWidget(
                           artworkSize: 98,
                         ),
-                        artworkFit: BoxFit.cover,
+                        artworkFit: BoxFit.scaleDown,
                       ),
                     ),
                   ),
