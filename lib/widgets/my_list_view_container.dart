@@ -52,6 +52,7 @@ class _MyListViewContainer extends State<MyListViewContainer> {
                   artist: artist,
                   source: uri,
                   title: title,
+                  artwork: artwork,
                 )));
   }
 
@@ -68,14 +69,17 @@ class _MyListViewContainer extends State<MyListViewContainer> {
             child:
                 Wrap(crossAxisAlignment: WrapCrossAlignment.center, children: [
               ClipRRect(
-                borderRadius: const BorderRadius.all(Radius.circular(10)),
-                child: QueryArtworkWidget(
-                  id: artwork.id,
-                  type: artwork.type,
-                  nullArtworkWidget: const NullArtworkWidget(artworkSize: 50,),
-                  artworkFit: BoxFit.cover,
-                ),
-              ),
+                  borderRadius: const BorderRadius.all(Radius.circular(10)),
+                    child: QueryArtworkWidget(
+                      artworkBorder: BorderRadius.all(const Radius.circular(10)),
+                      id: artwork.id,
+                      type: artwork.type,
+                      nullArtworkWidget: const NullArtworkWidget(
+                        artworkSize: 50,
+                      ),
+                      artworkFit: BoxFit.cover,
+                    ),
+                  ),
               Padding(
                 padding: const EdgeInsets.only(
                   left: 16,

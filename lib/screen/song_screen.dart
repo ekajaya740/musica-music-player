@@ -2,22 +2,28 @@ import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:musica_music_player/constants/color_constants.dart';
 import 'package:musica_music_player/widgets/my_text.dart';
+import 'package:musica_music_player/widgets/null_artwork_widget.dart';
+import 'package:on_audio_query/on_audio_query.dart';
 
 class SongScreen extends StatefulWidget {
   final String source;
   final String title;
   final String artist;
+  final QueryArtworkWidget artwork;
 
   SongScreen({
     required this.title,
     required this.artist,
     required this.source,
+    required this.artwork,
   });
   @override
+  // ignore: no_logic_in_create_state
   State<StatefulWidget> createState() => _SongScreen(
-        title: this.title,
-        artist: this.artist,
-        source: this.source,
+        title: title,
+        artist: artist,
+        source: source,
+        artwork: artwork,
       );
 }
 
@@ -25,12 +31,14 @@ class _SongScreen extends State<SongScreen> {
   final String source;
   final String title;
   final String artist;
+  final QueryArtworkWidget artwork;
   final AudioPlayer _audioPlayer = AudioPlayer();
 
   _SongScreen({
     required this.title,
     required this.artist,
     required this.source,
+    required this.artwork,
   });
 
   @override
@@ -68,6 +76,8 @@ class _SongScreen extends State<SongScreen> {
             horizontal: 19,
           ),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -98,64 +108,84 @@ class _SongScreen extends State<SongScreen> {
                   ),
                 ],
               ),
-              Container(
-                width: 310,
-                height: 205,
-                color: Colors.white,
-              ),
-              Column(children: [
-                MyText(
-                  title,
-                  textAlign: TextAlign.center,
-                  fontWeight: FontWeight.w700,
-                  fontSize: 24,
-                  maxLines: 2,
+              Wrap(alignment: WrapAlignment.center, children: [
+                Padding(
+                  padding: const EdgeInsets.only(
+                    bottom: 10,
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(10),
+                    child: Container(
+                      width: 310,
+                      height: 205,
+                      color: secondaryColor500,
+                      child: QueryArtworkWidget(
+                        artworkBorder:
+                            const BorderRadius.all(Radius.circular(10)),
+                        id: artwork.id,
+                        type: artwork.type,
+                        nullArtworkWidget: const NullArtworkWidget(
+                          artworkSize: 98,
+                        ),
+                        artworkFit: BoxFit.cover,
+                      ),
+                    ),
+                  ),
                 ),
-                MyText(
-                  artist,
-                  textAlign: TextAlign.center,
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
-                  color: primaryColor300,
-                ),
+                Column(children: [
+                  MyText(
+                    title,
+                    textAlign: TextAlign.center,
+                    fontWeight: FontWeight.w700,
+                    fontSize: 24,
+                    maxLines: 2,
+                  ),
+                  MyText(
+                    artist,
+                    textAlign: TextAlign.center,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    color: primaryColor300,
+                  ),
+                ]),
               ]),
               Column(mainAxisAlignment: MainAxisAlignment.center, children: [
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    StreamBuilder<PlayerState>(
-                        stream: _audioPlayer.playerStateStream,
-                        builder: (context, snapshot) {
-                          final playerState = snapshot.data;
-                          return _playShuffle(playerState!);
-                        }),
-                    StreamBuilder<PlayerState>(
-                        stream: _audioPlayer.playerStateStream,
-                        builder: (context, snapshot) {
-                          final playerState = snapshot.data;
-                          return _playPrev(playerState!);
-                        }),
+                    // StreamBuilder<PlayerState>(
+                    //     stream: _audioPlayer.playerStateStream,
+                    //     builder: (context, snapshot) {
+                    //       final playerState = snapshot.data;
+                    //       return _playShuffle(playerState!);
+                    //     }),
+                    // StreamBuilder<PlayerState>(
+                    //     stream: _audioPlayer.playerStateStream,
+                    //     builder: (context, snapshot) {
+                    //       final playerState = snapshot.data;
+                    //       return _playPrev(playerState!);
+                    //     }),
                     StreamBuilder<PlayerState>(
                         stream: _audioPlayer.playerStateStream,
                         builder: (context, snapshot) {
                           final playerState = snapshot.data;
                           return _playButton(playerState!);
                         }),
-                    StreamBuilder<PlayerState>(
-                        stream: _audioPlayer.playerStateStream,
-                        builder: (context, snapshot) {
-                          final playerState = snapshot.data;
-                          return _playNext(playerState!);
-                        }),
-                    StreamBuilder<PlayerState>(
-                        stream: _audioPlayer.playerStateStream,
-                        builder: (context, snapshot) {
-                          final playerState = snapshot.data;
-                          return _playRepeat(playerState!);
-                        }),
+                    // StreamBuilder<PlayerState>(
+                    //     stream: _audioPlayer.playerStateStream,
+                    //     builder: (context, snapshot) {
+                    //       final playerState = snapshot.data;
+                    //       return _playNext(playerState!);
+                    //     }),
+                    // StreamBuilder<PlayerState>(
+                    //     stream: _audioPlayer.playerStateStream,
+                    //     builder: (context, snapshot) {
+                    //       final playerState = snapshot.data;
+                    //       return _playRepeat(playerState!);
+                    //     }),
                   ],
-                )
-              ])
+                ),
+              ]),
             ],
           ),
         ),
@@ -169,7 +199,7 @@ class _SongScreen extends State<SongScreen> {
       style: ElevatedButton.styleFrom(
         primary: Colors.transparent,
         shape: const CircleBorder(),
-        elevation: 1,
+        elevation: 10,
       ),
       onPressed: playing ? _audioPlayer.pause : _audioPlayer.play,
       child: Container(
@@ -183,8 +213,8 @@ class _SongScreen extends State<SongScreen> {
           shape: BoxShape.circle,
         ),
         child: Ink(
-          width: 60,
-          height: 60,
+          width: 80,
+          height: 80,
           decoration: const BoxDecoration(
             shape: BoxShape.circle,
             gradient: LinearGradient(
@@ -200,7 +230,7 @@ class _SongScreen extends State<SongScreen> {
             padding: const EdgeInsets.all(6),
             child: Icon(
               playing ? Icons.pause_rounded : Icons.play_arrow_rounded,
-              size: 40,
+              size: 60,
             ),
           ),
         ),

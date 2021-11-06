@@ -62,22 +62,22 @@ class _MainScreen extends State<MainScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              // const Padding(
+              //   padding: EdgeInsets.only(
+              //     top: 8.0,
+              //   ),
+              //   child: TextField(
+              //     decoration: InputDecoration(
+              //       prefixIcon: Icon(
+              //         Icons.search_rounded,
+              //         color: primaryColor300,
+              //       ),
+              //     ),
+              //   ),
+              // ),
               const Padding(
                 padding: EdgeInsets.only(
-                  top: 8.0,
-                ),
-                child: TextField(
-                  decoration: InputDecoration(
-                    prefixIcon: Icon(
-                      Icons.search_rounded,
-                      color: primaryColor300,
-                    ),
-                  ),
-                ),
-              ),
-              const Padding(
-                padding: EdgeInsets.only(
-                  top: 20,
+                  top: 24,
                 ),
                 child: MyText(
                   "Your Music",
@@ -103,7 +103,7 @@ class _MainScreen extends State<MainScreen> {
                     return SizedBox(
                         width: MediaQuery.of(context).size.width,
                         height: MediaQuery.of(context).size.height -
-                            (kToolbarHeight + 176),
+                            (kToolbarHeight + 128),
                         child: ListView.builder(
                           itemCount: item.data!.length,
                           itemBuilder: (context, index) => MyListViewContainer(
@@ -111,7 +111,7 @@ class _MainScreen extends State<MainScreen> {
                             artist: item.data![index].artist ?? "No Artist",
                             artwork: QueryArtworkWidget(
                               id: item.data![index].id,
-                              type: ArtworkType.ALBUM,
+                              type: ArtworkType.AUDIO,
                             ),
                             uri: item.data![index].uri.toString(),
                           ),
