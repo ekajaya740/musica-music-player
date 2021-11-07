@@ -71,7 +71,7 @@ class _MyListViewContainer extends State<MyListViewContainer> {
               ClipRRect(
                   borderRadius: const BorderRadius.all(Radius.circular(10)),
                     child: QueryArtworkWidget(
-                      artworkBorder: BorderRadius.all(const Radius.circular(10)),
+                      artworkBorder: const BorderRadius.all(Radius.circular(10)),
                       id: artwork.id,
                       type: artwork.type,
                       nullArtworkWidget: const NullArtworkWidget(

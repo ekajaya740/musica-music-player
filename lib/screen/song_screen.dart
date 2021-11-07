@@ -11,12 +11,13 @@ class SongScreen extends StatefulWidget {
   final String artist;
   final QueryArtworkWidget artwork;
 
-  SongScreen({
+  const SongScreen({
+    Key? key,
     required this.title,
     required this.artist,
     required this.source,
     required this.artwork,
-  });
+  }):super(key: key,);
   @override
   // ignore: no_logic_in_create_state
   State<StatefulWidget> createState() => _SongScreen(

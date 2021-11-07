@@ -97,7 +97,7 @@ class _MainScreen extends State<MainScreen> {
                     }
                     if (item.data!.isEmpty) {
                       return const Center(
-                        child: Text("Nothing found!"),
+                        child: MyText("Nothing found!"),
                       );
                     }
                     return SizedBox(
